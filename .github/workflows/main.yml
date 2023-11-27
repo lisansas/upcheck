@@ -13,4 +13,19 @@ jobs:
         run: |
           cmake -G "NMake clean" .
           nmake
-      # ...
+      - name: create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ env.APP_UPLOAD_NAME }}
+          release_name: ${{ env.APP_UPLOAD_NAME }}
+          draft: false
+          prerelease: false
+      - name : upload apk
+        uses: actions/upload-artifact@master
+        if: always()
+        with:
+          name: ${{ env.APP_UPLOAD_NAME }}
+          path: ${{ env.APP_UPLOAD }}
