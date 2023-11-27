@@ -13,19 +13,23 @@ jobs:
         run: |
           cmake -G "NMake clean" .
           nmake
-      - name: create release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Release and upload assets
+        uses: svenstaro/upload-release-action@v2
         with:
-          tag_name: ${{ env.APP_UPLOAD_NAME }}
-          release_name: ${{ env.APP_UPLOAD_NAME }}
-          draft: false
-          prerelease: false
-      - name : upload apk
-        uses: actions/upload-artifact@master
-        if: always()
-        with:
-          name: ${{ env.APP_UPLOAD_NAME }}
-          path: ${{ env.APP_UPLOAD }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          release_name: ${{ env.RELEASE_NAME }}
+          tag: ${{ env.TAG_NAME }}
+          file_glob: true
+          file: ./publish/*
+
+      - name: Git push assets to "release" branch
+        run: |
+          cd publish || exit 1
+          git init
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b release
+          git add .
+          git commit -m "${{ env.RELEASE_NAME }}"
+          git remote add origin "https://${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
+          git push -f -u origin release
