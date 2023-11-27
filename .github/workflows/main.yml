@@ -18,7 +18,6 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           release_name: ${{ env.RELEASE_NAME }}
-          tag: ${{ env.TAG_NAME }}
           file_glob: true
           file: ./publish/*
 
